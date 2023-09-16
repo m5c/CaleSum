@@ -82,7 +82,7 @@ def strip_time_zone(range, time_zone):
     return range
 
 
-def range_without_timezone_to_start_stop_strings(range: str) -> [str]:
+def range_without_timezone_to_start_stop_strings(range: str) -> dict:
     """
     Consumes a range string without time zone information. Is guaranteed of format `* to *` (
     contains keyword 'to'). First and or second half may contain 'at' keyword. Not all
@@ -93,10 +93,11 @@ def range_without_timezone_to_start_stop_strings(range: str) -> [str]:
     'at' only in last: not legal. (all day events must be all day in both)
     'at' in none: both substrings are pure date (all day) information without time.
     :param range: as string without 'Scheduled' and without time zone information.
-    :return: coherent start and end string. If no time information provided (all day event)
+    :return: coherent start and end string as start and stop entries in dictionary. multi-day
+    flag to indicate the range coveres multiple daysa nd a all-day falg to indicate no time
+    information is contained in range string. If no time information provided (all day event)
     midnight (first moment of day) is used as time info. (day begins at midnight, so we use 12
-    AM, equivalent to
-    00:00)
+    AM, equivalent to 00:00)
     """
     # Reject in case string does not contain the 'to' keyword
     if "to" not in range:
@@ -130,10 +131,13 @@ def range_without_timezone_to_start_stop_strings(range: str) -> [str]:
             "Provided string cannot be interpreted. Start has not time but end has. All day "
             "events cannot be unilateral.")
 
-    return [start, stop]
+    result: dict = {}
+    result['start'] = start
+    result['stop'] = stop
+    return result
 
 
-def scheduled_to_start_stop_strings(scheduled_string: str) -> [str]:
+def scheduled_to_start_stop_strings(scheduled_string: str) -> Event:
     """
     Converts scheduled time range to two strings indicating start and end, in same notation as
     original. This does not yet convert time string to system millis.
@@ -159,8 +163,8 @@ def scheduled_to_start_stop_strings(scheduled_string: str) -> [str]:
     time_zone = extract_time_zone_if_present(range)
     range_without_timezone: [str] = range_without_timezone_to_start_stop_strings(range, time_zone)
 
-    start_with_timezone: str = range_without_timezone[0] + ", " + time_zone
-    stop_with_timezone: str = range_without_timezone[1] + ", " + time_zone
+    start_with_timezone: str = range_without_timezone['start'] + ", " + time_zone
+    stop_with_timezone: str = range_without_timezone['stop'] + ", " + time_zone
 
     return [start_with_timezone, stop_with_timezone]
 

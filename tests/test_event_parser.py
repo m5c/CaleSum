@@ -6,8 +6,6 @@ from calendar_intel.event_parser import extract_time_zone_if_present, \
 
 class Test(TestCase):
 
-    # "Scheduled: Oct 9, 2023 at 2:00 AM to Oct 10, 2023 at 2:15 AM, EDT"
-
     def test_same_day_with_timezone(self):
         test_string: str = "Scheduled: Aug 28, 2023 at 7:15 AM to 7:45 AM, EDT"
 
@@ -19,8 +17,9 @@ class Test(TestCase):
                           "Aug 28, 2023 at 7:15 AM to 7:45 AM")
 
         # test extraction of start and stop datestamps
-        self.assertEqual(range_without_timezone_to_start_stop_strings("Aug 28, 2023 at 7:15 AM to 7:45 AM")[0], "Aug 28, 2023 at 7:15 AM")
-        self.assertEqual(range_without_timezone_to_start_stop_strings("Aug 28, 2023 at 7:15 AM to 7:45 AM")[1], "Aug 28, 2023 at 7:45 AM")
+        parsed_string: dict = range_without_timezone_to_start_stop_strings("Aug 28, 2023 at 7:15 AM to 7:45 AM")
+        self.assertEqual(parsed_string['start'], "Aug 28, 2023 at 7:15 AM")
+        self.assertEqual(parsed_string['stop'], "Aug 28, 2023 at 7:45 AM")
 
 
     def test_same_day_without_timezone(self):
@@ -32,9 +31,9 @@ class Test(TestCase):
                           "Nov 6, 2023 to Nov 7, 2023")
 
         # test extraction of start and stop datestamps
-        print(range_without_timezone_to_start_stop_strings("Nov 6, 2023 to Nov 7, 2023"))
-        self.assertEqual(range_without_timezone_to_start_stop_strings("Nov 6, 2023 to Nov 7, 2023")[0], "Nov 6, 2023 at 0:01 AM")
-        self.assertEqual(range_without_timezone_to_start_stop_strings("Nov 6, 2023 to Nov 7, 2023")[1], "Nov 7, 2023 at 11:59 PM")
+        parsed_string: dict = range_without_timezone_to_start_stop_strings("Nov 6, 2023 to Nov 7, 2023")
+        self.assertEqual(parsed_string['start'], "Nov 6, 2023 at 0:01 AM")
+        self.assertEqual(parsed_string['stop'], "Nov 7, 2023 at 11:59 PM")
 
     def test_other_day_with_timezone(self):
         test_string: str = "Scheduled: Nov 5, 2023 at 12:00 PM to Nov 7, 2023 at 1:00 PM, EST"
@@ -45,9 +44,9 @@ class Test(TestCase):
                           "Nov 5, 2023 at 12:00 PM to Nov 7, 2023 at 1:00 PM")
 
         # test extraction of start and stop datestamps
-        print(range_without_timezone_to_start_stop_strings("Nov 5, 2023 at 12:00 PM to Nov 7, 2023 at 1:00 PM"))
-        self.assertEqual(range_without_timezone_to_start_stop_strings("Nov 5, 2023 at 12:00 PM to Nov 7, 2023 at 1:00 PM")[0], "Nov 5, 2023 at 12:00 PM")
-        self.assertEqual(range_without_timezone_to_start_stop_strings("Nov 5, 2023 at 12:00 PM to Nov 7, 2023 at 1:00 PM")[1], "Nov 7, 2023 at 1:00 PM")
+        parsed_string: dict = range_without_timezone_to_start_stop_strings("Nov 5, 2023 at 12:00 PM to Nov 7, 2023 at 1:00 PM")
+        self.assertEqual(parsed_string['start'], "Nov 5, 2023 at 12:00 PM")
+        self.assertEqual(parsed_string['stop'], "Nov 7, 2023 at 1:00 PM")
 
     def test_same_day_with_plusminus_timezone(self):
         test_string: str = "Scheduled: Oct 12, 2023 at 10:15 AM to 11:15 AM, GMT-4"
@@ -58,6 +57,6 @@ class Test(TestCase):
                           "Oct 12, 2023 at 10:15 AM to 11:15 AM")
 
         # test extraction of start and stop datestamps
-        print(range_without_timezone_to_start_stop_strings("Oct 12, 2023 at 10:15 AM to 11:15 AM"))
-        self.assertEqual(range_without_timezone_to_start_stop_strings("Oct 12, 2023 at 10:15 AM to 11:15 AM")[0], "Oct 12, 2023 at 10:15 AM")
-        self.assertEqual(range_without_timezone_to_start_stop_strings("Oct 12, 2023 at 10:15 AM to 11:15 AM")[1], "Oct 12, 2023 at 11:15 AM")
+        parsed_string: dict = range_without_timezone_to_start_stop_strings("Oct 12, 2023 at 10:15 AM to 11:15 AM")
+        self.assertEqual(parsed_string['start'], "Oct 12, 2023 at 10:15 AM")
+        self.assertEqual(parsed_string['stop'], "Oct 12, 2023 at 11:15 AM")
