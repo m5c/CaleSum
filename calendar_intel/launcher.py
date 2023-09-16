@@ -9,7 +9,12 @@ from calendar_intel.event_parser import parse_calendar_paste
 
 # Top level window
 frame = Tk()
-frame.title("TextBox Input")
+frame.title("Calendar Intel")
+
+# Set app icon
+img = Image("photo", file="icon.png")
+# frame.iconphoto(True, img) # you may also want to try this.
+frame.tk.call('wm','iconphoto', frame._w, img)
 
 # Create new window, in middle of screen. See: https://stackoverflow.com/a/14912644/13805480
 w = 800  # width for the Tk root
