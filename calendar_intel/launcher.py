@@ -44,17 +44,17 @@ def handle_click():
     events: [Event] = parse_calendar_paste(raw_calendar_events, time_zone_selection.get())
 
     # Filter all events that contradict checkbox selection
-    events = event_miner.filter(events, include_all_day, include_multi_day)
+    events = event_miner.filter(events, include_all_day.get(), include_multi_day.get())
 
     # Create event summary (TODO: do something smarter here than just printing all events)
-    event_miner.create_stats(events, case_sensitive)
+    event_miner.create_stats(events, case_sensitive.get())
 
 
 # Menu options
 ## initialize variables:
-case_sensitive: bool = False
-include_all_day: bool = False
-include_multi_day: bool = False
+case_sensitive = IntVar()
+include_all_day = IntVar()
+include_multi_day = IntVar()
 OPTIONS = [
     "EDT",
     "CET"
