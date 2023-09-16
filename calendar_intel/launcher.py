@@ -1,7 +1,7 @@
 """
 Main launcher logic. Created new calendar intel window.
 """
-
+import tkinter
 from tkinter import *
 
 from calendar_intel import event_miner
@@ -12,9 +12,9 @@ frame = Tk()
 frame.title("Calendar Intel")
 
 # Set app icon
-img = Image("photo", file="icon.png")
-# frame.iconphoto(True, img) # you may also want to try this.
-frame.tk.call('wm','iconphoto', frame._w, img)
+# Comment this in for run without build
+# img = Image("photo", file="icon.png")
+# frame.tk.call('wm','iconphoto', frame._w, img)
 
 # Create new window, in middle of screen. See: https://stackoverflow.com/a/14912644/13805480
 w = 800  # width for the Tk root
@@ -52,7 +52,18 @@ def handle_click():
     events = event_miner.filter(events, include_all_day.get(), include_multi_day.get())
 
     # Create event summary (TODO: do something smarter here than just printing all events)
-    event_miner.create_stats(events, case_sensitive.get())
+    stats: str = event_miner.create_stats(events, case_sensitive.get())
+    print(stats)
+
+    # replace all window content with stats
+    for ui_elements in frame.winfo_children():
+        ui_elements.destroy()
+    text_field = Text(frame, width=100, height=y)
+    text_field.pack(in_=frame, side=TOP)
+    text_field.insert(END, stats)
+
+
+
 
 
 # Menu options

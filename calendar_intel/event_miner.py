@@ -56,6 +56,8 @@ def create_stats(events: [Event], case_sensitive: bool):
     sorted_title_stats: list = sorted(title_stats_by_title.items(), key=lambda item: item[1].total_time_seconds, reverse=True)
 
     # then print stats for each entry in map (for now unsorted)
+    stats_text: str = ""
     for stats in sorted_title_stats:
-        print('{:100s}  {:32s}'.format(stats[0], str(stats[1])))
+        stats_text += '{:44s}  {:32s}\n'.format(stats[0][:40], str(stats[1]))
+    return stats_text
 

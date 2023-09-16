@@ -28,3 +28,18 @@ alias python3='/opt/homebrew/Cellar/python@3.11/3.11.5/bin/python3'
 Clone this project, then run from the base directory:  
 
 `python -m calendar_intel.launcher`
+
+## Build Instructions
+
+Comment out these lines in `launcher.py`:
+
+```
+img = Image("photo", file="icon.png")
+frame.tk.call('wm','iconphoto', frame._w, img)
+```
+
+To build a native mac app:
+
+ * Install `pip install pyinstaller`
+ * Run `./build.sh`
+ * Mac application is on Desktop.
