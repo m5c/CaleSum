@@ -8,6 +8,10 @@ import re
 
 from calendar_intel.event import Event
 
+# All day events have not tiem information, we use this presents to override.
+day_start: str = "0:00 AM"
+day_end: str = "11:59 PM"
+
 
 def parse_calendar_paste(pasted_raw_event_string: str) -> None:
     print("Making sense of pasted String...")
@@ -99,37 +103,48 @@ def range_without_timezone_to_start_stop_strings(range: str) -> dict:
     midnight (first moment of day) is used as time info. (day begins at midnight, so we use 12
     AM, equivalent to 00:00)
     """
+    multi_day: bool = False
+    all_day: bool = False
+
     # Reject in case string does not contain the 'to' keyword
     if "to" not in range:
-        raise Exception("The provided string is not a time range.")
-    start: str = range.split("to")[0].strip()
-    stop: str = range.split("to")[1].strip()
+        # This is an all day event that does not span to another day.
+        # Create dummy end date and return directly
+        all_day = True
+        start = range + " at " + day_start
+        stop = range + " at " + day_end
 
-    at_in_first: bool = "at" in start
-    at_in_second: bool = "at" in stop
-
-    # Case 1: "at" in both. => Both are already day + time
-    if at_in_first and at_in_second:
-        # String is already good as is
-        pass
-
-    # Case 2: "at" only in first => Use day of first for second
-    elif at_in_first and not at_in_second:
-        # Use day info of start for stop
-        stop = start.split("at")[0] + "at " + stop
-
-    # Case 3: no "at" in either
-    elif not at_in_first and not at_in_second:
-        # These are all day events, use first second after midnight for start, one second before
-        # midnight for second
-        start = start + " at 0:01 AM"
-        stop = stop + " at 11:59 PM"
-
-    # Note: "at" only in second is not legal. Cannot be all day in first and not in second.
     else:
-        raise Exception(
-            "Provided string cannot be interpreted. Start has not time but end has. All day "
-            "events cannot be unilateral.")
+        start: str = range.split("to")[0].strip()
+        stop: str = range.split("to")[1].strip()
+
+        at_in_first: bool = "at" in start
+        at_in_second: bool = "at" in stop
+
+        # Case 1: "at" in both. => Both are already day + time
+        if at_in_first and at_in_second:
+            # String is already good as is, two seperate days and times
+            multi_day = True
+
+        # Case 2: "at" only in first => Use day of first for second
+        elif at_in_first and not at_in_second:
+            # Use day info of start for stop
+            stop = start.split("at")[0] + "at " + stop
+
+        # Case 3: no "at" in either
+        elif not at_in_first and not at_in_second:
+            # These are all day events, use first second after midnight for start, one second before
+            # midnight for second
+            start = start + " at " + day_start
+            stop = stop + " at " + day_end
+            all_day = True
+            multi_day = True
+
+        # Note: "at" only in second is not legal. Cannot be all day in first and not in second.
+        else:
+            raise Exception(
+                "Provided string cannot be interpreted. Start has not time but end has. All day "
+                "events cannot be unilateral.")
 
     result: dict = {}
     result['start'] = start
