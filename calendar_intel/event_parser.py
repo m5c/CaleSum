@@ -7,6 +7,7 @@ https://stackoverflow.com/questions/13258554/convert-unknown-format-strings-to-d
 import re
 
 from calendar_intel.event import Event
+import dateutil.parser as parser
 
 # All day events have not tiem information, we use this presents to override.
 day_start: str = "0:00 AM"
@@ -22,7 +23,8 @@ def parse_calendar_paste(pasted_raw_event_string: str) -> None:
 
     # Create event objects out of strings
     if len(events_as_strings) > 0:
-        parse_single_event_string(events_as_strings[0])
+        for event_string in events_as_strings:
+            print(parse_single_event_string(event_string))
 
     # Use this library... https://stackoverflow.com/questions/13258554/convert-unknown-format
     # -strings-to-datetime-objects
@@ -37,9 +39,24 @@ def parse_single_event_string(event_string: str) -> Event:
     """
     title: str = event_string.splitlines()[0]
     # Remove prefix from time range description
-    range: [str] = scheduled_to_start_stop_strings(event_string.splitlines()[1])
-    # start = parser.parse(range[0])
-    # end = parser.parse(range[1])
+    scheduled_string: str = event_string.splitlines()[1]
+
+    # Strip initial "Scheduled keyword"
+    range_string: str = scheduled_string.replace('Scheduled: ', '')
+    # time zone is empty if no time zone information found.
+    time_zone = extract_time_zone_if_present(range_string)
+
+    # if time zone not empty, remove from string
+    if time_zone:
+        range_string = range_string[:len(range_string)-len(time_zone)-2]
+
+    event_dict: dict = range_without_timezone_to_start_stop_strings(range_string, time_zone)
+
+    # Try to make sense of the unified start and end time string
+    start_timestamp: int = parser.parse(event_dict['start'])
+    end_timestamp: int = parser.parse(event_dict['stop'])
+    return Event(title, start_timestamp, end_timestamp, event_dict['all_day'],
+                 event_dict['multi_day'], event_dict['time_zone'])
 
 
 def extract_time_zone_if_present(range) -> str:
@@ -86,7 +103,7 @@ def strip_time_zone(range, time_zone):
     return range
 
 
-def range_without_timezone_to_start_stop_strings(range: str) -> dict:
+def range_without_timezone_to_start_stop_strings(range: str, time_zone: str) -> dict:
     """
     Consumes a range string without time zone information. Is guaranteed of format `* to *` (
     contains keyword 'to'). First and or second half may contain 'at' keyword. Not all
@@ -146,57 +163,18 @@ def range_without_timezone_to_start_stop_strings(range: str) -> dict:
                 "Provided string cannot be interpreted. Start has not time but end has. All day "
                 "events cannot be unilateral.")
 
+    # append time zone it not empty
+    if time_zone:
+        start = start + ", " + time_zone
+        stop = stop + ", " + time_zone
+
     result: dict = {}
     result['start'] = start
     result['stop'] = stop
     result['all_day'] = all_day
     result['multi_day'] = multi_day
+    result['time_zone'] = time_zone
     return result
-
-
-def scheduled_to_start_stop_strings(scheduled_string: str) -> Event:
-    """
-    Converts scheduled time range to two strings indicating start and end, in same notation as
-    original. This does not yet convert time string to system millis.
-    Sample inputs:
-    Scheduled: Aug 28, 2023 at 7:15 AM to 7:45 AM, EDT
-    Scheduled: Nov 6, 2023 to Nov 7, 2023
-    Scheduled: Nov 5, 2023 at 12:00 PM to Nov 7, 2023 at 1:00 PM, EST
-    Scheduled: Oct 12, 2023 at 10:15 AM to 11:15 AM, GMT-4
-    -> Not all inputs have time zone information
-    -> Not all inputs have hour information
-    -> Not all inputs have same day for start and end
-    => All inputs have "to" keyword
-    => Time zone information is only provided once, at end.
-    => Time zone format changes, can be GMT+- or actual time zone name.
-
-
-    :param scheduled_string:
-    :return: two strings as list, each in same string format. First is start, second is end.
-    """
-    # Strip initial "Scheduled keyword"
-    range: str = scheduled_string.replace('Scheduled: ', '')
-    # time zone is empty if no time zone information found.
-    time_zone = extract_time_zone_if_present(range)
-    range_without_timezone: [str] = range_without_timezone_to_start_stop_strings(range, time_zone)
-
-    start_with_timezone: str = range_without_timezone['start'] + ", " + time_zone
-    stop_with_timezone: str = range_without_timezone['stop'] + ", " + time_zone
-
-    return [start_with_timezone, stop_with_timezone]
-
-    # start_without_timezone: str = range_without_timezone.split(' to')[0]
-    # end_without_timezone: str = range_without_timezone.split(' to')[1]
-    # # Now start is something like: "Aug 27, 2023 at 9:00 AM "
-    # # And end is something like: " 11:30 AM"
-    # start_without_timezone = start_without_timezone.replace(' at', ',')
-    #
-    # # If end is shorter than 10 characters, we assume it is an event on the same day as start,
-    # # so we still need to concatenate the original day information.
-    #
-    # # Print to check
-    # print("Time Zone: \"" + time_zone + "\"")
-    # print("Range remaining \"" + start_without_timezone + "\", \"" + end_without_timezone + "\"")
 
 
 def separate_string_by_event(pasted_raw_events: str) -> str:

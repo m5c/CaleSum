@@ -18,9 +18,9 @@ class Test(TestCase):
 
         # test extraction of start and stop datestamps
         parsed_string: dict = range_without_timezone_to_start_stop_strings(
-            "Aug 28, 2023 at 7:15 AM to 7:45 AM")
-        self.assertEqual(parsed_string['start'], "Aug 28, 2023 at 7:15 AM")
-        self.assertEqual(parsed_string['stop'], "Aug 28, 2023 at 7:45 AM")
+            "Aug 28, 2023 at 7:15 AM to 7:45 AM", "EDT")
+        self.assertEqual(parsed_string['start'], "Aug 28, 2023 at 7:15 AM, EDT")
+        self.assertEqual(parsed_string['stop'], "Aug 28, 2023 at 7:45 AM, EDT")
         self.assertEqual(parsed_string['all_day'], False)
         self.assertEqual(parsed_string['multi_day'], False)
 
@@ -35,7 +35,7 @@ class Test(TestCase):
 
         # test extraction of start and stop datestamps
         parsed_string: dict = range_without_timezone_to_start_stop_strings(
-            "Nov 6, 2023 to Nov 7, 2023")
+            "Nov 6, 2023 to Nov 7, 2023", "")
         self.assertEqual(parsed_string['start'], "Nov 6, 2023 at 0:00 AM")
         self.assertEqual(parsed_string['stop'], "Nov 7, 2023 at 11:59 PM")
         self.assertEqual(parsed_string['all_day'], True)
@@ -51,9 +51,9 @@ class Test(TestCase):
 
         # test extraction of start and stop datestamps
         parsed_string: dict = range_without_timezone_to_start_stop_strings(
-            "Nov 5, 2023 at 12:00 PM to Nov 7, 2023 at 1:00 PM")
-        self.assertEqual(parsed_string['start'], "Nov 5, 2023 at 12:00 PM")
-        self.assertEqual(parsed_string['stop'], "Nov 7, 2023 at 1:00 PM")
+            "Nov 5, 2023 at 12:00 PM to Nov 7, 2023 at 1:00 PM", "EST")
+        self.assertEqual(parsed_string['start'], "Nov 5, 2023 at 12:00 PM, EST")
+        self.assertEqual(parsed_string['stop'], "Nov 7, 2023 at 1:00 PM, EST")
         self.assertEqual(parsed_string['all_day'], False)
         self.assertEqual(parsed_string['multi_day'], True)
 
@@ -67,9 +67,9 @@ class Test(TestCase):
 
         # test extraction of start and stop datestamps
         parsed_string: dict = range_without_timezone_to_start_stop_strings(
-            "Oct 12, 2023 at 10:15 AM to 11:15 AM")
-        self.assertEqual(parsed_string['start'], "Oct 12, 2023 at 10:15 AM")
-        self.assertEqual(parsed_string['stop'], "Oct 12, 2023 at 11:15 AM")
+            "Oct 12, 2023 at 10:15 AM to 11:15 AM", "GMT-4")
+        self.assertEqual(parsed_string['start'], "Oct 12, 2023 at 10:15 AM, GMT-4")
+        self.assertEqual(parsed_string['stop'], "Oct 12, 2023 at 11:15 AM, GMT-4")
         self.assertEqual(parsed_string['all_day'], False)
         self.assertEqual(parsed_string['multi_day'], False)
 
@@ -83,7 +83,7 @@ class Test(TestCase):
 
         # test extraction of start and stop datestamps
         parsed_string: dict = range_without_timezone_to_start_stop_strings(
-            "Oct 12, 2023")
+            "Oct 12, 2023", "")
         self.assertEqual(parsed_string['start'], "Oct 12, 2023 at 0:00 AM")
         self.assertEqual(parsed_string['stop'], "Oct 12, 2023 at 11:59 PM")
         self.assertEqual(parsed_string['all_day'], True)

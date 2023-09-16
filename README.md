@@ -16,6 +16,13 @@ alias python='/opt/homebrew/Cellar/python@3.11/3.11.5/bin/python3'
 alias python3='/opt/homebrew/Cellar/python@3.11/3.11.5/bin/python3'
 ```
 
+## Usage
+
+## Features
+
+ * Supports multi day events
+ * Supports all day events
+
 ## Run Instructions
 
 Clone this project, then run from the base directory:  
