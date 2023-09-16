@@ -149,6 +149,8 @@ def range_without_timezone_to_start_stop_strings(range: str) -> dict:
     result: dict = {}
     result['start'] = start
     result['stop'] = stop
+    result['all_day'] = all_day
+    result['multi_day'] = multi_day
     return result
 
 

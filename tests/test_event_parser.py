@@ -21,6 +21,9 @@ class Test(TestCase):
             "Aug 28, 2023 at 7:15 AM to 7:45 AM")
         self.assertEqual(parsed_string['start'], "Aug 28, 2023 at 7:15 AM")
         self.assertEqual(parsed_string['stop'], "Aug 28, 2023 at 7:45 AM")
+        self.assertEqual(parsed_string['all_day'], False)
+        self.assertEqual(parsed_string['multi_day'], False)
+
 
     def test_same_day_without_timezone(self):
         test_string: str = "Scheduled: Nov 6, 2023 to Nov 7, 2023"
@@ -35,6 +38,8 @@ class Test(TestCase):
             "Nov 6, 2023 to Nov 7, 2023")
         self.assertEqual(parsed_string['start'], "Nov 6, 2023 at 0:00 AM")
         self.assertEqual(parsed_string['stop'], "Nov 7, 2023 at 11:59 PM")
+        self.assertEqual(parsed_string['all_day'], True)
+        self.assertEqual(parsed_string['multi_day'], True)
 
     def test_other_day_with_timezone(self):
         test_string: str = "Scheduled: Nov 5, 2023 at 12:00 PM to Nov 7, 2023 at 1:00 PM, EST"
@@ -49,6 +54,8 @@ class Test(TestCase):
             "Nov 5, 2023 at 12:00 PM to Nov 7, 2023 at 1:00 PM")
         self.assertEqual(parsed_string['start'], "Nov 5, 2023 at 12:00 PM")
         self.assertEqual(parsed_string['stop'], "Nov 7, 2023 at 1:00 PM")
+        self.assertEqual(parsed_string['all_day'], False)
+        self.assertEqual(parsed_string['multi_day'], True)
 
     def test_same_day_with_plusminus_timezone(self):
         test_string: str = "Scheduled: Oct 12, 2023 at 10:15 AM to 11:15 AM, GMT-4"
@@ -63,6 +70,8 @@ class Test(TestCase):
             "Oct 12, 2023 at 10:15 AM to 11:15 AM")
         self.assertEqual(parsed_string['start'], "Oct 12, 2023 at 10:15 AM")
         self.assertEqual(parsed_string['stop'], "Oct 12, 2023 at 11:15 AM")
+        self.assertEqual(parsed_string['all_day'], False)
+        self.assertEqual(parsed_string['multi_day'], False)
 
     def test_single_all_day(self):
         test_string: str = "Scheduled: Oct 12, 2023"
@@ -77,3 +86,5 @@ class Test(TestCase):
             "Oct 12, 2023")
         self.assertEqual(parsed_string['start'], "Oct 12, 2023 at 0:00 AM")
         self.assertEqual(parsed_string['stop'], "Oct 12, 2023 at 11:59 PM")
+        self.assertEqual(parsed_string['all_day'], True)
+        self.assertEqual(parsed_string['multi_day'], False)
