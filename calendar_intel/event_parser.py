@@ -5,7 +5,6 @@ https://stackoverflow.com/questions/13258554/convert-unknown-format-strings-to-d
 """
 
 import re
-from datetime import timedelta
 
 import dateutil.parser as parser
 
@@ -16,20 +15,19 @@ day_start: str = "0:00 AM"
 day_end: str = "11:59 PM"
 
 
-def parse_calendar_paste(pasted_raw_event_string: str, default_time_zone: str) -> None:
-    print("Making sense of pasted String...")
+def parse_calendar_paste(pasted_raw_event_string: str, default_time_zone: str) -> [Event]:
 
     # Split long string into individual event strings
     events_as_strings: [str] = separate_string_by_event(pasted_raw_event_string)
-    print(events_as_strings)
 
     # Create event objects out of strings
+    events: [Event] = []
     if len(events_as_strings) > 0:
         for event_string in events_as_strings:
-            print(parse_single_event_string(event_string, default_time_zone))
+            events.append(parse_single_event_string(event_string, default_time_zone))
 
-    # Use this library... https://stackoverflow.com/questions/13258554/convert-unknown-format
-    # -strings-to-datetime-objects
+    # Return full list (not yet filtered)
+    return events
 
 
 def parse_single_event_string(event_string: str, default_time_zone: str) -> Event:
@@ -64,7 +62,8 @@ def parse_single_event_string(event_string: str, default_time_zone: str) -> Even
     # Compute event duration
     event_duration_seconds: int = (end_timestamp - start_timestamp).total_seconds()
 
-    return Event(title, start_timestamp, end_timestamp, event_duration_seconds, event_dict['all_day'],
+    return Event(title, start_timestamp, end_timestamp, event_duration_seconds,
+                 event_dict['all_day'],
                  event_dict['multi_day'], event_dict['time_zone'])
 
 

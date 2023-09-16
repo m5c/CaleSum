@@ -4,6 +4,7 @@ Main launcher logic. Created new calendar intel window.
 
 from tkinter import *
 
+from calendar_intel import event_miner
 from calendar_intel.event_parser import parse_calendar_paste
 
 # Top level window
@@ -32,30 +33,50 @@ bottom = Frame(frame)
 top.pack(side=TOP)
 bottom.pack(side=BOTTOM, fill=BOTH, expand=True)
 
+
 # Function for getting Input
 # from textbox and printing it
 # at label widget
 def handle_click():
     raw_calendar_events: str = inputtxt.get(1.0, "end-1c")
-    parse_calendar_paste(raw_calendar_events, time_zone_selection.get())
+
+    # Convert pasted string to list of events
+    events: [Event] = parse_calendar_paste(raw_calendar_events, time_zone_selection.get())
+
+    # Filter all events that contradict checkbox selection
+    events = event_miner.filter(events, include_all_day, include_multi_day)
+
+    # Create event summary (TODO: do something smarter here than just printing all events)
+    event_miner.create_stats(events, case_sensitive)
+
 
 # Menu options
-c1 = Checkbutton(frame, text='All Day Events  ')
+## initialize variables:
+case_sensitive: bool = False
+include_all_day: bool = False
+include_multi_day: bool = False
+OPTIONS = [
+    "EDT",
+    "CET"
+]
+## Create gui elements
+c0 = Checkbutton(frame, text='Case sensitive  ', variable=case_sensitive, onvalue=True,
+                 offvalue=False)
+c0.pack(in_=top, side=LEFT)
+c1 = Checkbutton(frame, text='All-day events  ', variable=include_all_day, onvalue=True,
+                 offvalue=False)
 c1.pack(in_=top, side=LEFT)
-c2 = Checkbutton(frame, text='Multi Day Events  ')
+c2 = Checkbutton(frame, text='Multi-day events  ', variable=include_multi_day, onvalue=True,
+                 offvalue=False)
 c2.pack(in_=top, side=LEFT)
 # Timezone
 lbl = Label(frame, text="Default Time-Zone: ")
 lbl.pack(in_=top, side=LEFT)
-OPTIONS = [
-"EDT",
-"CET"
-]
+
 time_zone_selection = StringVar(frame)
 time_zone_selection.set(OPTIONS[0])
 w = OptionMenu(frame, time_zone_selection, *OPTIONS)
 w.pack(in_=top, side=LEFT)
-
 
 # The actual calendar parser
 # Label Creation
@@ -64,13 +85,13 @@ lbl.pack()
 
 # TextBox Creation
 inputtxt = Text(frame,
-                   height=45,
-                   width=100)
+                height=45,
+                width=100)
 inputtxt.pack()
 
 # Button Creation
 printButton = Button(frame,
-                        text="Create Breakdown",
-                        command=handle_click)
+                     text="Create Breakdown",
+                     command=handle_click)
 printButton.pack()
 frame.mainloop()
