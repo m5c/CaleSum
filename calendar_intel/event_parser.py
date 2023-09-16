@@ -94,11 +94,43 @@ def range_without_timezone_to_start_stop_strings(range: str) -> [str]:
     'at' in none: both substrings are pure date (all day) information without time.
     :param range: as string without 'Scheduled' and without time zone information.
     :return: coherent start and end string. If no time information provided (all day event)
-    midnight (first moment of day) is used as time info. (day begins at midnight, so we use 12 AM, equivalent to
+    midnight (first moment of day) is used as time info. (day begins at midnight, so we use 12
+    AM, equivalent to
     00:00)
     """
-    # TODO: implement
-    return ['', '']
+    # Reject in case string does not contain the 'to' keyword
+    if "to" not in range:
+        raise Exception("The provided string is not a time range.")
+    start: str = range.split("to")[0].strip()
+    stop: str = range.split("to")[1].strip()
+
+    at_in_first: bool = "at" in start
+    at_in_second: bool = "at" in stop
+
+    # Case 1: "at" in both. => Both are already day + time
+    if at_in_first and at_in_second:
+        # String is already good as is
+        pass
+
+    # Case 2: "at" only in first => Use day of first for second
+    elif at_in_first and not at_in_second:
+        # Use day info of start for stop
+        stop = start.split("at")[0] + "at " + stop
+
+    # Case 3: no "at" in either
+    elif not at_in_first and not at_in_second:
+        # These are all day events, use first second after midnight for start, one second before
+        # midnight for second
+        start = start + " at 0:01 AM"
+        stop = stop + " at 11:59 PM"
+
+    # Note: "at" only in second is not legal. Cannot be all day in first and not in second.
+    else:
+        raise Exception(
+            "Provided string cannot be interpreted. Start has not time but end has. All day "
+            "events cannot be unilateral.")
+
+    return [start, stop]
 
 
 def scheduled_to_start_stop_strings(scheduled_string: str) -> [str]:
@@ -125,7 +157,12 @@ def scheduled_to_start_stop_strings(scheduled_string: str) -> [str]:
     range: str = scheduled_string.replace('Scheduled: ', '')
     # time zone is empty if no time zone information found.
     time_zone = extract_time_zone_if_present(range)
-    range_without_timezone = strip_time_zone(range, time_zone)
+    range_without_timezone: [str] = range_without_timezone_to_start_stop_strings(range, time_zone)
+
+    start_with_timezone: str = range_without_timezone[0] + ", " + time_zone
+    stop_with_timezone: str = range_without_timezone[1] + ", " + time_zone
+
+    return [start_with_timezone, stop_with_timezone]
 
     # start_without_timezone: str = range_without_timezone.split(' to')[0]
     # end_without_timezone: str = range_without_timezone.split(' to')[1]
