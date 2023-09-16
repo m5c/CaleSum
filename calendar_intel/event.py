@@ -6,7 +6,7 @@ Author: Maximilian Schiedermeier
 
 class Event:
 
-    def __init__(self, title: str, start: int, end: int, all_day: bool, multi_day: bool,
+    def __init__(self, title: str, start: int, end: int, duration: int, all_day: bool, multi_day: bool,
                  time_zone: str):
         """
         Event that allocates a range of system time to a descriptive activity.
@@ -17,7 +17,7 @@ class Event:
         self.title: str = title
         self.start: int = start
         self.end: int = end
-        self.duration: int = 0
+        self.duration: int = duration
         self.all_day: bool = all_day
         self.multi_day: bool = multi_day
         self.time_zone: str = time_zone

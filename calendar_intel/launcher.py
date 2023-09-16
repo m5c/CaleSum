@@ -37,7 +37,7 @@ bottom.pack(side=BOTTOM, fill=BOTH, expand=True)
 # at label widget
 def handle_click():
     raw_calendar_events: str = inputtxt.get(1.0, "end-1c")
-    parse_calendar_paste(raw_calendar_events)
+    parse_calendar_paste(raw_calendar_events, time_zone_selection.get())
 
 # Menu options
 c1 = Checkbutton(frame, text='All Day Events  ')
@@ -48,12 +48,12 @@ c2.pack(in_=top, side=LEFT)
 lbl = Label(frame, text="Default Time-Zone: ")
 lbl.pack(in_=top, side=LEFT)
 OPTIONS = [
-"Montréal (EDT)",
-"Europe (CET)  "
+"EDT",
+"CET"
 ]
-variable = StringVar(frame)
-variable.set(OPTIONS[0])
-w = OptionMenu(frame, variable, *OPTIONS)
+time_zone_selection = StringVar(frame)
+time_zone_selection.set(OPTIONS[0])
+w = OptionMenu(frame, time_zone_selection, *OPTIONS)
 w.pack(in_=top, side=LEFT)
 
 

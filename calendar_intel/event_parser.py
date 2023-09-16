@@ -5,16 +5,18 @@ https://stackoverflow.com/questions/13258554/convert-unknown-format-strings-to-d
 """
 
 import re
+from datetime import timedelta
 
-from calendar_intel.event import Event
 import dateutil.parser as parser
 
-# All day events have not tiem information, we use this presents to override.
+from calendar_intel.event import Event
+
+# All day events have not time information, we use this presents to override.
 day_start: str = "0:00 AM"
 day_end: str = "11:59 PM"
 
 
-def parse_calendar_paste(pasted_raw_event_string: str) -> None:
+def parse_calendar_paste(pasted_raw_event_string: str, default_time_zone: str) -> None:
     print("Making sense of pasted String...")
 
     # Split long string into individual event strings
@@ -24,13 +26,13 @@ def parse_calendar_paste(pasted_raw_event_string: str) -> None:
     # Create event objects out of strings
     if len(events_as_strings) > 0:
         for event_string in events_as_strings:
-            print(parse_single_event_string(event_string))
+            print(parse_single_event_string(event_string, default_time_zone))
 
     # Use this library... https://stackoverflow.com/questions/13258554/convert-unknown-format
     # -strings-to-datetime-objects
 
 
-def parse_single_event_string(event_string: str) -> Event:
+def parse_single_event_string(event_string: str, default_time_zone: str) -> Event:
     """
     Converts a single textual event string to a corresponding event object
     :param event_string: as multiple lines of text describing a single string. First line must be
@@ -48,14 +50,21 @@ def parse_single_event_string(event_string: str) -> Event:
 
     # if time zone not empty, remove from string
     if time_zone:
-        range_string = range_string[:len(range_string)-len(time_zone)-2]
+        range_string = range_string[:len(range_string) - len(time_zone) - 2]
+    else:
+        # else override time zone field with default time zone
+        time_zone = default_time_zone
 
     event_dict: dict = range_without_timezone_to_start_stop_strings(range_string, time_zone)
 
     # Try to make sense of the unified start and end time string
     start_timestamp: int = parser.parse(event_dict['start'])
     end_timestamp: int = parser.parse(event_dict['stop'])
-    return Event(title, start_timestamp, end_timestamp, event_dict['all_day'],
+
+    # Compute event duration
+    event_duration_seconds: int = (end_timestamp - start_timestamp).total_seconds()
+
+    return Event(title, start_timestamp, end_timestamp, event_duration_seconds, event_dict['all_day'],
                  event_dict['multi_day'], event_dict['time_zone'])
 
 
