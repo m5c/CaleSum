@@ -6,6 +6,8 @@ from calendar_intel.event_parser import extract_time_zone_if_present, \
 
 class Test(TestCase):
 
+    # "Scheduled: Oct 9, 2023 at 2:00 AM to Oct 10, 2023 at 2:15 AM, EDT"
+
     def test_same_day_with_timezone(self):
         test_string: str = "Scheduled: Aug 28, 2023 at 7:15 AM to 7:45 AM, EDT"
 

@@ -56,7 +56,7 @@ def extract_time_zone_if_present(range) -> str:
 
     # Find last comma in string (with rfind), it indicates transition to potential time zone info
     last_comma_pos: int = range.rfind(',')
-    potential_time_zone: str = range[last_comma_pos+2:]
+    potential_time_zone: str = range[last_comma_pos + 2:]
 
     # Not all date strings have time zone. We can find out by searching for three subsequent
     # upper case characters: https://stackoverflow.com/a/20538792/13805480
@@ -78,8 +78,27 @@ def strip_time_zone(range, time_zone):
     # Create start and end strings without timezone, if not empty
     # the "-2" is because of the omitted timezone ", " prefix
     if time_zone:
-        range = range[:len(range)-len(time_zone)-2]
+        range = range[:len(range) - len(time_zone) - 2]
     return range
+
+
+def range_without_timezone_to_start_stop_strings(range: str) -> [str]:
+    """
+    Consumes a range string without time zone information. Is guaranteed of format `* to *` (
+    contains keyword 'to'). First and or second half may contain 'at' keyword. Not all
+    combinations are legal. Semantic of second substring (after 'to') changes dependeing on
+    whether 'at' string is present in first half.
+    'at' in both: both substrings are date and time.
+    'at' only in first: first substring is date and time, second is date of first one at other time.
+    'at' only in last: not legal. (all day events must be all day in both)
+    'at' in none: both substrings are pure date (all day) information without time.
+    :param range: as string without 'Scheduled' and without time zone information.
+    :return: coherent start and end string. If no time information provided (all day event)
+    midnight (first moment of day) is used as time info. (day begins at midnight, so we use 12 AM, equivalent to
+    00:00)
+    """
+    # TODO: implement
+    return ['', '']
 
 
 def scheduled_to_start_stop_strings(scheduled_string: str) -> [str]:
@@ -107,7 +126,6 @@ def scheduled_to_start_stop_strings(scheduled_string: str) -> [str]:
     # time zone is empty if no time zone information found.
     time_zone = extract_time_zone_if_present(range)
     range_without_timezone = strip_time_zone(range, time_zone)
-    print(range_without_timezone)
 
     # start_without_timezone: str = range_without_timezone.split(' to')[0]
     # end_without_timezone: str = range_without_timezone.split(' to')[1]
