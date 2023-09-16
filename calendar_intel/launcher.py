@@ -1,6 +1,5 @@
 """
 Main launcher logic. Created new calendar intel window.
-See: https://stackoverflow.com/questions/13258554/convert-unknown-format-strings-to-datetime-objects
 """
 
 import tkinter as tk
