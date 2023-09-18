@@ -5,8 +5,14 @@ Author: Maximilian Schiedermeier
 
 
 class Event:
+    """
+    Represents an iCal event with title, start, duration, etc...
+    """
 
-    def __init__(self, title: str, start: int, end: int, duration: int, all_day: bool, multi_day: bool,
+    # pylint: disable=too-few-public-methods
+
+    def __init__(self, title: str, start: int, end: int, duration: int, all_day: bool,
+                 multi_day: bool,
                  time_zone: str):
         """
         Event that allocates a range of system time to a descriptive activity.
@@ -14,6 +20,7 @@ class Event:
         :param start:
         :param end:
         """
+        # #pylint: disable=too-many-arguments
         self.title: str = title
         self.start: int = start
         self.end: int = end

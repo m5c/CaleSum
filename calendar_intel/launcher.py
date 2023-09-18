@@ -1,7 +1,6 @@
 """
 Main launcher logic. Created new calendar intel window.
 """
-import tkinter
 from tkinter import *
 
 from calendar_intel import event_miner
@@ -49,7 +48,7 @@ def handle_click():
     events: [Event] = parse_calendar_paste(raw_calendar_events, time_zone_selection.get())
 
     # Filter all events that contradict checkbox selection
-    events = event_miner.filter(events, include_all_day.get(), include_multi_day.get())
+    events = event_miner.event_filter(events, include_all_day.get(), include_multi_day.get())
 
     # Create event summary (TODO: do something smarter here than just printing all events)
     stats: str = event_miner.create_stats(events, case_sensitive.get())
