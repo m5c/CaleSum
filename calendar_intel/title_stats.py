@@ -22,12 +22,20 @@ class TitleStats:
     def total_amount_events(self) -> int:
         return len(self.events)
 
-    def format_seconds(self) -> str:
-        days: int = self.total_time_seconds // (60*60*24)
-        hours: int = self.total_time_seconds % (60*60*24) // (60*60)
-        minutes: int = self.total_time_seconds % (60*24) // 60
-        seconds: int = self.total_time_seconds % 60
-        return str(int(days))+"d "+str(int(hours))+"h "+str(int(minutes))+"m "+str(int(seconds))+"s"
-
     def __str__(self):
-        return self.format_seconds()+" ("+str(self.total_amount_events)+" Events)"
+        return format_human_readable_time(self.total_time_seconds) + " (" + str(
+            self.total_amount_events) + " Events)"
+
+
+def format_human_readable_time(seconds: int) -> str:
+    """
+    Converts amount of time in seconds (int) to a human readable string of days, hours, etc...
+    :param: amount in seconds as int
+    :return: human-readable string
+    """
+    days: int = seconds // (60 * 60 * 24)
+    hours: int = seconds % (60 * 60 * 24) // (60 * 60)
+    minutes: int = seconds % (60 * 24) // 60
+    secs: int = seconds % 60
+    return str(int(days)) + "d " + str(int(hours)) + "h " + str(int(minutes)) + "m " + str(
+        int(secs)) + "s"

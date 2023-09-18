@@ -3,7 +3,7 @@ Consumes a list of events and analyzes the contained information,, e.g. to creat
 breakdown or statistics.
 """
 from calendar_intel.event import Event
-from calendar_intel.title_stats import TitleStats
+from calendar_intel.title_stats import TitleStats, format_human_readable_time
 
 
 def filter(events: [Event], include_all_day: bool, include_multi_day: bool):
@@ -53,11 +53,14 @@ def create_stats(events: [Event], case_sensitive: bool):
 
     # sort dictionary by total times
     # python is messy, it's not actually a list that comes back, but a list of tuples
-    sorted_title_stats: list = sorted(title_stats_by_title.items(), key=lambda item: item[1].total_time_seconds, reverse=True)
+    sorted_title_stats: list = sorted(title_stats_by_title.items(),
+                                      key=lambda item: item[1].total_time_seconds, reverse=True)
 
     # then print stats for each entry in map (for now unsorted)
     stats_text: str = ""
+    total_time: int = 0
     for stats in sorted_title_stats:
         stats_text += '{:44s}  {:32s}\n'.format(stats[0][:40], str(stats[1]))
-    return stats_text
+        total_time += stats[1].total_time_seconds
 
+    return "Total time: " + format_human_readable_time(total_time) + "\n----------\n" + stats_text
