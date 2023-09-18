@@ -1,5 +1,7 @@
 # Calendar Intel
 
+![icon](icon.png)
+
 A simple tool for MacOS to quickly figure our how much time you spent on tasks.
 
 ## Install Instructions
