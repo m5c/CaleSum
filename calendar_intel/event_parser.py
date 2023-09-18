@@ -6,9 +6,10 @@ https://stackoverflow.com/questions/13258554/convert-unknown-format-strings-to-d
 
 import re
 
-import dateutil.parser as parser
+from dateutil import parser
 
 from calendar_intel.event import Event
+from calendar_intel.event_parser_exception import EventParserException
 
 # All day events have not time information, we use this presents to override.
 day_start: str = "0:00 AM"
@@ -16,7 +17,10 @@ day_end: str = "11:59 PM"
 
 
 def parse_calendar_paste(pasted_raw_event_string: str, default_time_zone: str) -> [Event]:
-
+    """
+    Consumes the string of all pasted events (provided to gui) and parses every single event.
+    Returns list of event objects that can be easily mined for statistics.
+    """
     # Split long string into individual event strings
     events_as_strings: [str] = separate_string_by_event(pasted_raw_event_string)
 
@@ -67,9 +71,10 @@ def parse_single_event_string(event_string: str, default_time_zone: str) -> Even
                  event_dict['multi_day'], event_dict['time_zone'])
 
 
-def extract_time_zone_if_present(range) -> str:
+def extract_time_zone_if_present(range_string: str) -> str:
     """
-    :param range: consumes a time range and extracts time zone info if existing. If there is not
+    :param range_string: consumes a time range and extracts time zone info if existing. If there
+    is not
     time
     zone info it returns an empty string.
     Algorithm:
@@ -80,12 +85,12 @@ def extract_time_zone_if_present(range) -> str:
     :return: time zone string without leading ', ' or empty string if not time zone was detected.
     """
     # Do not process if there is no at least one comma.
-    if ',' not in range:
+    if ',' not in range_string:
         return ""
 
     # Find last comma in string (with rfind), it indicates transition to potential time zone info
-    last_comma_pos: int = range.rfind(',')
-    potential_time_zone: str = range[last_comma_pos + 2:]
+    last_comma_pos: int = range_string.rfind(',')
+    potential_time_zone: str = range_string[last_comma_pos + 2:]
 
     # Not all date strings have time zone. We can find out by searching for three subsequent
     # upper case characters: https://stackoverflow.com/a/20538792/13805480
@@ -97,21 +102,22 @@ def extract_time_zone_if_present(range) -> str:
     return ""
 
 
-def strip_time_zone(range, time_zone):
+def strip_time_zone(range_string: str, time_zone: str) -> str:
     """
     Reduces time zone information from range string, if time_zone is not empty
-    :param range: as range string (without 'Scheduled prefix', but possibly with timezone info)
+    :param range_string: as range string (without 'Scheduled prefix', but possibly with timezone
+    info)
     :param time_zone: as previously extracted time zone info for range.
     :return: range without time zone info
     """
     # Create start and end strings without timezone, if not empty
     # the "-2" is because of the omitted timezone ", " prefix
     if time_zone:
-        range = range[:len(range) - len(time_zone) - 2]
-    return range
+        range_string = range_string[:len(range_string) - len(time_zone) - 2]
+    return range_string
 
 
-def range_without_timezone_to_start_stop_strings(range: str, time_zone: str) -> dict:
+def range_without_timezone_to_start_stop_strings(range_string: str, time_zone: str) -> dict:
     """
     Consumes a range string without time zone information. Is guaranteed of format `* to *` (
     contains keyword 'to'). First and or second half may contain 'at' keyword. Not all
@@ -121,7 +127,7 @@ def range_without_timezone_to_start_stop_strings(range: str, time_zone: str) -> 
     'at' only in first: first substring is date and time, second is date of first one at other time.
     'at' only in last: not legal. (all day events must be all day in both)
     'at' in none: both substrings are pure date (all day) information without time.
-    :param range: as string without 'Scheduled' and without time zone information.
+    :param range_string: as string without 'Scheduled' and without time zone information.
     :return: coherent start and end string as start and stop entries in dictionary. multi-day
     flag to indicate the range coveres multiple daysa nd a all-day falg to indicate no time
     information is contained in range string. If no time information provided (all day event)
@@ -132,16 +138,16 @@ def range_without_timezone_to_start_stop_strings(range: str, time_zone: str) -> 
     all_day: bool = False
 
     # Reject in case string does not contain the 'to' keyword
-    if "to" not in range:
+    if "to" not in range_string:
         # This is an all day event that does not span to another day.
         # Create dummy end date and return directly
         all_day = True
-        start = range + " at " + day_start
-        stop = range + " at " + day_end
+        start = range_string + " at " + day_start
+        stop = range_string + " at " + day_end
 
     else:
-        start: str = range.split("to")[0].strip()
-        stop: str = range.split("to")[1].strip()
+        start: str = range_string.split("to")[0].strip()
+        stop: str = range_string.split("to")[1].strip()
 
         at_in_first: bool = "at" in start
         at_in_second: bool = "at" in stop
@@ -167,7 +173,7 @@ def range_without_timezone_to_start_stop_strings(range: str, time_zone: str) -> 
 
         # Note: "at" only in second is not legal. Cannot be all day in first and not in second.
         else:
-            raise Exception(
+            raise EventParserException(
                 "Provided string cannot be interpreted. Start has not time but end has. All day "
                 "events cannot be unilateral.")
 
