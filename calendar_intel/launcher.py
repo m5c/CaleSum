@@ -1,7 +1,8 @@
 """
 Main launcher logic. Created new calendar intel window.
 """
-from tkinter import *
+from tkinter import Frame, TOP, BOTTOM, BOTH, IntVar, Checkbutton, Label, LEFT, StringVar, \
+    OptionMenu, Text, Button, END, Event, Tk
 
 from calendar_intel import event_miner
 from calendar_intel.event_parser import parse_calendar_paste
@@ -16,20 +17,20 @@ frame.title("Calendar Intel")
 # frame.tk.call('wm','iconphoto', frame._w, img)
 
 # Create new window, in middle of screen. See: https://stackoverflow.com/a/14912644/13805480
-w = 800  # width for the Tk root
-h = 670  # height for the Tk root
+width: int = 800  # width for the Tk root
+height: int = 670  # height for the Tk root
 
 # get screen width and height
-ws = frame.winfo_screenwidth()  # width of the screen
-hs = frame.winfo_screenheight()  # height of the screen
+ws: int = frame.winfo_screenwidth()  # width of the screen
+hs: int = frame.winfo_screenheight()  # height of the screen
 
 # calculate x and y coordinates for the Tk root window
-x = (ws / 2) - (w / 2)
-y = (hs / 2) - (h / 2)
+x_dimensions: int = (ws / 2) - (width / 2)
+y_dimensions: int = (hs / 2) - (height / 2)
 
 # set the dimensions of the screen
 # and where it is placed
-frame.geometry('%dx%d+%d+%d' % (w, h, x, y))
+frame.geometry('%dx%d+%d+%d' % (width, height, x_dimensions, y_dimensions))
 
 # Two sub frames, one above, one below.
 top = Frame(frame)
@@ -42,6 +43,10 @@ bottom.pack(side=BOTTOM, fill=BOTH, expand=True)
 # from textbox and printing it
 # at label widget
 def handle_click():
+    """
+    Handler for click on parse events button. When clicked this interprets whatever text
+    currently is in the main textbox, parses, starts to mine, ...
+    """
     raw_calendar_events: str = inputtxt.get(1.0, "end-1c")
 
     # Convert pasted string to list of events
@@ -57,12 +62,9 @@ def handle_click():
     # replace all window content with stats
     for ui_elements in frame.winfo_children():
         ui_elements.destroy()
-    text_field = Text(frame, width=100, height=y)
+    text_field = Text(frame, width=100, height=y_dimensions)
     text_field.pack(in_=frame, side=TOP)
     text_field.insert(END, stats)
-
-
-
 
 
 # Menu options
@@ -90,8 +92,8 @@ lbl.pack(in_=top, side=LEFT)
 
 time_zone_selection = StringVar(frame)
 time_zone_selection.set(OPTIONS[0])
-w = OptionMenu(frame, time_zone_selection, *OPTIONS)
-w.pack(in_=top, side=LEFT)
+width = OptionMenu(frame, time_zone_selection, *OPTIONS)
+width.pack(in_=top, side=LEFT)
 
 # The actual calendar parser
 # Label Creation
