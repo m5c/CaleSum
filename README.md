@@ -54,6 +54,10 @@ To build a native mac app:
  * Run `./build.sh`
  * Mac application is on Desktop.
 
+## Builds
+
+Prebuilt Mac applications are ready for download, [here](https://github.com/m5c/CaleSum/releases).
+
 ## Author / Pull Requests
 
  * Author: Maximilian Schiedermeier
