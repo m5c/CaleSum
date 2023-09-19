@@ -1,4 +1,4 @@
-# Calendar Intel
+# CaleSum
 
 ![icon](icon.png)
 
