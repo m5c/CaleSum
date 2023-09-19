@@ -19,7 +19,13 @@ A simple tool for MacOS to quickly figure our how much time you spent on tasks.
  3) Hit 'Create Breakdown`.  
 ![breakdown](docs/breakdown.png)
 
-## Install Instructions
+## Builds
+
+Prebuilt Mac applications are ready for download, [here](https://github.com/m5c/CaleSum/releases).
+
+## Compile from Sources
+
+### Install Requirements
 
 This requires a *recent* version of python and tkinter, to support [apple silicon](https://support.apple.com/en-ca/HT211814).
 
@@ -33,13 +39,7 @@ alias python='/opt/homebrew/Cellar/python@3.11/3.11.5/bin/python3'
 alias python3='/opt/homebrew/Cellar/python@3.11/3.11.5/bin/python3'
 ```
 
-## Run Instructions
-
-Clone this project, then run from the base directory:  
-
-`python -m calendar_intel.launcher`
-
-## Build Instructions
+### Build Mac Application
 
 Comment out these lines in `launcher.py`:
 
@@ -54,9 +54,6 @@ To build a native mac app:
  * Run `./build.sh`
  * Mac application is on Desktop.
 
-## Builds
-
-Prebuilt Mac applications are ready for download, [here](https://github.com/m5c/CaleSum/releases).
 
 ## Author / Pull Requests
 
