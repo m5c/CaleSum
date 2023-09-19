@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from calendar_intel.event_parser import extract_time_zone_if_present, \
+from cale_sum.event_parser import extract_time_zone_if_present, \
     strip_time_zone, range_without_timezone_to_start_stop_strings
 
 

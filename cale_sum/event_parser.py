@@ -5,11 +5,12 @@ https://stackoverflow.com/questions/13258554/convert-unknown-format-strings-to-d
 """
 
 import re
+from datetime import datetime
 
 from dateutil import parser
 
-from calendar_intel.event import Event
-from calendar_intel.event_parser_exception import EventParserException
+from cale_sum.event import Event
+from cale_sum.event_parser_exception import EventParserException
 
 # All day events have not time information, we use this presents to override.
 day_start: str = "0:00 AM"
@@ -60,8 +61,8 @@ def parse_single_event_string(event_string: str, default_time_zone: str) -> Even
     event_dict: dict = range_without_timezone_to_start_stop_strings(range_string, time_zone)
 
     # Try to make sense of the unified start and end time string
-    start_timestamp: int = parser.parse(event_dict['start'])
-    end_timestamp: int = parser.parse(event_dict['stop'])
+    start_timestamp: datetime = parser.parse(event_dict['start'])
+    end_timestamp: datetime = parser.parse(event_dict['stop'])
 
     # Compute event duration
     event_duration_seconds: int = (end_timestamp - start_timestamp).total_seconds()

@@ -1,5 +1,5 @@
-cd calendar_intel
-pyinstaller --onefile --windowed launcher.py --icon=icon.icns -n "Calendar Intel"
+cd cale_sum || exit
+pyinstaller --onefile --windowed launcher.py --icon=icon.icns -n "CaleSum"
 rm -rf build
 mv dist/*app ~/Desktop
 rm -rf dist

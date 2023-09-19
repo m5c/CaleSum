@@ -4,12 +4,12 @@ Main launcher logic. Created new calendar intel window.
 from tkinter import Frame, TOP, BOTTOM, BOTH, IntVar, Checkbutton, Label, LEFT, StringVar, \
     OptionMenu, Text, Button, END, Event, Tk
 
-from calendar_intel import event_miner
-from calendar_intel.event_parser import parse_calendar_paste
+from cale_sum import event_miner
+from cale_sum.event_parser import parse_calendar_paste
 
 # Top level window
 frame = Tk()
-frame.title("Calendar Intel")
+frame.title("CaleSum")
 
 # Set app icon
 # Comment this in for run without build
@@ -53,9 +53,10 @@ def handle_click():
     events: [Event] = parse_calendar_paste(raw_calendar_events, time_zone_selection.get())
 
     # Filter all events that contradict checkbox selection
-    events = event_miner.event_filter(events, include_all_day.get(), include_multi_day.get())
+    events = event_miner.event_filter(events, include_all_day.get(), include_multi_day.get(),
+                                      dominant_month_only.get())
 
-    # Create event summary (TODO: do something smarter here than just printing all events)
+    # Create event summary
     stats: str = event_miner.create_stats(events, case_sensitive.get())
     print(stats)
 
@@ -72,6 +73,7 @@ def handle_click():
 case_sensitive = IntVar()
 include_all_day = IntVar()
 include_multi_day = IntVar()
+dominant_month_only = IntVar()
 OPTIONS = [
     "EDT",
     "CET"
@@ -86,6 +88,10 @@ c1.pack(in_=top, side=LEFT)
 c2 = Checkbutton(frame, text='Multi-day events  ', variable=include_multi_day, onvalue=True,
                  offvalue=False)
 c2.pack(in_=top, side=LEFT)
+c3 = Checkbutton(frame, text='Detect target month  ', variable=dominant_month_only, onvalue=True,
+                 offvalue=False)
+dominant_month_only.set(1)
+c3.pack(in_=top, side=LEFT)
 # Timezone
 lbl = Label(frame, text="Default Time-Zone: ")
 lbl.pack(in_=top, side=LEFT)

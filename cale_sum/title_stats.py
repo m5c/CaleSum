@@ -1,4 +1,4 @@
-from calendar_intel.event import Event
+from cale_sum.event import Event
 
 
 class TitleStats:
