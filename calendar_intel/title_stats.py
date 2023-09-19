@@ -35,7 +35,7 @@ def format_human_readable_time(seconds: int) -> str:
     """
     days: int = seconds // (60 * 60 * 24)
     hours: int = seconds % (60 * 60 * 24) // (60 * 60)
-    minutes: int = seconds % (60 * 24) // 60
+    minutes: int = seconds % (60 * 60) // 60
     secs: int = seconds % 60
     return str(int(days)) + "d " + str(int(hours)) + "h " + str(int(minutes)) + "m " + str(
         int(secs)) + "s"
